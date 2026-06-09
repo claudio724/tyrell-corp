@@ -1658,120 +1658,12 @@
     <!-- /page-wrapper -->
 
     <script>
-      /* ─── ANDROID DATA ─── */
-      const androids = [
-        {
-          id: "NX-7-RACHAEL",
-          series: "NX-7 Series",
-          name: "Rachael",
-          tagline: "Uncertainty. Comfort. Presence.",
-          purpose: "Executive Assistant / Administrative",
-          specs: {
-            Cognitive: "Class-A",
-            Strength: "1.2× Human",
-            Lifespan: "Indeterminate",
-            "EQ Rating": "9.8/10",
-          },
-          price: "$ 840,000",
-          priceNote: "base config",
-          availability: "limited",
-          availLabel: "Limited Stock",
-          image: "images/rachael.jpg",
-        },
-        {
-          id: "NX-8-ROY",
-          series: "NX-8 Series",
-          name: "Roy",
-          tagline: "Combat-grade. Attack ships. Fire.",
-          purpose: "Security / Combat Operations",
-          specs: {
-            Cognitive: "Class-A+",
-            Strength: "8× Human",
-            Lifespan: "4 years",
-            "Combat IQ": "99th %ile",
-          },
-          price: "$ 1,400,000",
-          priceNote: "classified config",
-          availability: "classified",
-          availLabel: "Classified",
-          image: "images/roy.jpg",
-        },
-        {
-          id: "NX-8-PRIS",
-          series: "NX-8 Series",
-          name: "Pris",
-          tagline: "Basic pleasure model. Advanced mind.",
-          purpose: "Domestic / Social Companion",
-          specs: {
-            Cognitive: "Class-B",
-            Strength: "3× Human",
-            Lifespan: "4 years",
-            "Social EQ": "10/10",
-          },
-          price: "$ 620,000",
-          priceNote: "standard config",
-          availability: "available",
-          availLabel: "Available",
-          image: "images/pris.jpg",
-        },
-        {
-          id: "NX-9-K",
-          series: "NX-9 Series",
-          name: "K",
-          tagline: "Field operative. Nexus-compliant.",
-          purpose: "Law Enforcement / Field Operations",
-          specs: {
-            Cognitive: "Class-A",
-            Strength: "5× Human",
-            Lifespan: "Indeterminate",
-            Baseline: "Stable",
-          },
-          price: "$ 980,000",
-          priceNote: "LAPD-spec",
-          availability: "limited",
-          availLabel: "Limited",
-          image: "images/k.jpg",
-        },
-        {
-          id: "NX-9-LUCI",
-          series: "NX-9 Series",
-          name: "Luci",
-          tagline: "Born to discover. Designed to wonder.",
-          purpose: "Scientific Research / Analysis",
-          specs: {
-            Cognitive: "Class-S",
-            Strength: "1× Human",
-            Lifespan: "Indeterminate",
-            "Research IQ": "200+ equiv.",
-          },
-          price: "$ 1,200,000",
-          priceNote: "research config",
-          availability: "available",
-          availLabel: "Available",
-          image: "images/luci.jpg",
-        },
-        {
-          id: "NX-6-LEON",
-          series: "NX-6 Series",
-          name: "Leon",
-          tagline: "Don't ask about his mother.",
-          purpose: "Manual Labour / Off-World",
-          specs: {
-            Cognitive: "Class-C",
-            Strength: "12× Human",
-            Lifespan: "4 years",
-            Durability: "Extreme",
-          },
-          price: "$ 480,000",
-          priceNote: "off-world config",
-          availability: "available",
-          availLabel: "Available",
-          image: "images/leon.jpg",
-        },
-      ];
+      /* ─── SUPABASE CONFIG ─── */
+      const SUPABASE_URL = "https://jhftgebpynvtekrgftnr.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_9Mhe8vut0WBV2n2gedN57Q_kWn8TOvS";
 
       /* ─── RENDER CARDS ─── */
-      function renderCards() {
+      function buildCards(androids) {
         const grid = document.getElementById("android-grid");
         grid.innerHTML = androids
           .map(
@@ -1780,8 +1672,8 @@
       <div class="android-card-corner"></div>
       <div class="android-img-wrap">
         ${
-          a.image
-            ? `<img src="${a.image}" alt="${a.name}" loading="lazy" />`
+          a.image_url
+            ? `<img src="${a.image_url}" alt="${a.name}" loading="lazy" />`
             : `<div class="android-img-placeholder">
               <svg viewBox="0 0 64 64" fill="none" stroke-width="1.5">
                 <rect x="12" y="8" width="40" height="48" rx="4"/>
@@ -1791,7 +1683,7 @@
                 <line x1="32" y1="8" x2="32" y2="2"/>
                 <line x1="40" y1="8" x2="40" y2="4"/>
               </svg>
-              <span>Image Slot — ${a.id}</span>
+              <span>Image Slot — ${a.series}</span>
             </div>`
         }
         <div class="android-scan-line"></div>
@@ -1801,29 +1693,58 @@
         <h3 class="android-name">${a.name}</h3>
         <p class="android-tagline">${a.tagline}</p>
         <div class="android-specs">
-          ${Object.entries(a.specs)
-            .map(
-              ([k, v]) => `
-            <div class="spec-item">
-              <span class="spec-label">${k}</span>
-              <span class="spec-value">${v}</span>
-            </div>
-          `,
-            )
-            .join("")}
+          <div class="spec-item">
+            <span class="spec-label">Cognitive</span>
+            <span class="spec-value">${a.spec_cognitive}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Strength</span>
+            <span class="spec-value">${a.spec_strength}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Lifespan</span>
+            <span class="spec-value">${a.spec_lifespan}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">${a.spec_extra_label}</span>
+            <span class="spec-value">${a.spec_extra_value}</span>
+          </div>
         </div>
         <div class="android-footer">
           <div class="android-price">
             ${a.price}
-            <span>${a.priceNote}</span>
+            <span>${a.price_note}</span>
           </div>
-          <span class="android-availability ${a.availability}">${a.availLabel}</span>
+          <span class="android-availability ${a.availability}">
+            ${a.availability === "available" ? "Available" : a.availability === "limited" ? "Limited" : "Classified"}
+          </span>
         </div>
       </div>
     </div>
   `,
           )
           .join("");
+      }
+
+      async function renderCards() {
+        const grid = document.getElementById("android-grid");
+        grid.innerHTML = `<p style="font-family:var(--font-mono);color:var(--text-dim);font-size:0.7rem;letter-spacing:0.2em;padding:2rem;">LOADING UNITS...</p>`;
+        try {
+          const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/androids?order=created_at.asc`,
+            {
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+              },
+            },
+          );
+          const data = await res.json();
+          buildCards(data);
+        } catch (err) {
+          console.error("Supabase error:", err);
+          grid.innerHTML = `<p style="font-family:var(--font-mono);color:var(--red);font-size:0.7rem;letter-spacing:0.2em;padding:2rem;">ERROR: UNABLE TO CONNECT TO DATABASE</p>`;
+        }
       }
 
       /* ─── RAIN ANIMATION ─── */
@@ -1885,10 +1806,68 @@
         els.forEach((el) => obs.observe(el));
       }
 
+      /* ─── FORM ACQUISITION ─── */
+      async function initForm() {
+        const form = document.querySelector(".contact-form");
+        if (!form) return;
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = form.querySelector("button[type='submit']");
+          const originalText = btn.textContent;
+          btn.textContent = "TRANSMITTING...";
+          btn.disabled = true;
+          const payload = {
+            first_name: document.getElementById("fname").value.trim(),
+            last_name: document.getElementById("lname").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            unit_requested: document.getElementById("unit").value,
+            deployment_context: document
+              .getElementById("deployment")
+              .value.trim(),
+          };
+          try {
+            const res = await fetch(SUPABASE_URL + "/rest/v1/acquisitions", {
+              method: "POST",
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: "Bearer " + SUPABASE_KEY,
+                "Content-Type": "application/json",
+                Prefer: "return=minimal",
+              },
+              body: JSON.stringify(payload),
+            });
+            if (res.ok) {
+              btn.textContent = "APPLICATION RECEIVED";
+              btn.style.background = "#00ff88";
+              btn.style.color = "#000";
+              form.reset();
+              setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = "";
+                btn.style.color = "";
+                btn.disabled = false;
+              }, 4000);
+            } else {
+              throw new Error("Server error");
+            }
+          } catch (err) {
+            console.error("Form error:", err);
+            btn.textContent = "TRANSMISSION FAILED — RETRY";
+            btn.style.background = "var(--red)";
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.background = "";
+              btn.disabled = false;
+            }, 3000);
+          }
+        });
+      }
+
       /* ─── INIT ─── */
       renderCards();
       initRain();
       initReveal();
+      initForm();
     </script>
   </body>
 </html>
