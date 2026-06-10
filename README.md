@@ -1,13 +1,13 @@
 # Tyrell Corporation
 
-> *"More Human Than Human™"*
+> _"More Human Than Human™"_
 
 ![Vercel](https://img.shields.io/badge/deploy-Vercel-black?logo=vercel)
 ![Supabase](https://img.shields.io/badge/database-Supabase-3ECF8E?logo=supabase)
 ![HTML](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-f0b429)
 ![GitHub](https://img.shields.io/badge/repo-GitHub-181717?logo=github)
 
-Progetto finale del corso **Vibe Coding for Design 2026**.  
+Progetto finale del corso **Vibe Coding for Design 2026 di NID**.  
 Landing page di una società fittizia che produce e vende androidi — ispirata all'universo di **Blade Runner**.
 
 🔗 **Live:** [tyrell-corp.vercel.app](https://tyrell-corp.vercel.app)  
@@ -37,13 +37,13 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 
 ## Stack Tecnologico
 
-| Layer | Tecnologia | Note |
-|---|---|---|
-| Frontend | HTML5 + CSS3 + JS vanilla | Zero dipendenze, zero build step |
-| Font | Orbitron, Share Tech Mono, Rajdhani | Google Fonts |
-| Database | Supabase (PostgreSQL) | REST API, Row Level Security |
-| Hosting | Vercel | Deploy automatico da GitHub push |
-| Versioning | Git + GitHub | Repository pubblico |
+| Layer      | Tecnologia                          | Note                             |
+| ---------- | ----------------------------------- | -------------------------------- |
+| Frontend   | HTML5 + CSS3 + JS vanilla           | Zero dipendenze, zero build step |
+| Font       | Orbitron, Share Tech Mono, Rajdhani | Google Fonts                     |
+| Database   | Supabase (PostgreSQL)               | REST API, Row Level Security     |
+| Hosting    | Vercel                              | Deploy automatico da GitHub push |
+| Versioning | Git + GitHub                        | Repository pubblico              |
 
 ---
 
@@ -71,46 +71,48 @@ La scelta di un **singolo file HTML** è intenzionale: nessun bundler, nessuna d
 Due tabelle in PostgreSQL con Row Level Security abilitata:
 
 ### `androids`
+
 Contiene i dati di tutti gli androidi del catalogo. Lettura pubblica abilitata.
 
-| Colonna | Tipo | Descrizione |
-|---|---|---|
-| id | UUID | Chiave primaria |
-| series | TEXT | Es. "NX-9 Series" |
-| name | TEXT | Nome dell'androide |
-| tagline | TEXT | Frase descrittiva |
-| spec_cognitive | TEXT | Classe cognitiva |
-| spec_strength | TEXT | Moltiplicatore forza |
-| spec_lifespan | TEXT | Durata operativa |
-| price | TEXT | Prezzo di listino |
-| availability | TEXT | available / limited / classified |
-| image_url | TEXT | Path dell'immagine |
+| Colonna        | Tipo | Descrizione                      |
+| -------------- | ---- | -------------------------------- |
+| id             | UUID | Chiave primaria                  |
+| series         | TEXT | Es. "NX-9 Series"                |
+| name           | TEXT | Nome dell'androide               |
+| tagline        | TEXT | Frase descrittiva                |
+| spec_cognitive | TEXT | Classe cognitiva                 |
+| spec_strength  | TEXT | Moltiplicatore forza             |
+| spec_lifespan  | TEXT | Durata operativa                 |
+| price          | TEXT | Prezzo di listino                |
+| availability   | TEXT | available / limited / classified |
+| image_url      | TEXT | Path dell'immagine               |
 
 ### `acquisitions`
+
 Raccoglie le richieste di acquisto inviate dal form. Solo scrittura pubblica.
 
-| Colonna | Tipo | Descrizione |
-|---|---|---|
-| id | UUID | Chiave primaria |
-| first_name | TEXT | Nome richiedente |
-| last_name | TEXT | Cognome richiedente |
-| email | TEXT | Email corporativa |
-| unit_requested | TEXT | Modello richiesto |
-| deployment_context | TEXT | Contesto operativo |
-| created_at | TIMESTAMP | Data richiesta |
+| Colonna            | Tipo      | Descrizione         |
+| ------------------ | --------- | ------------------- |
+| id                 | UUID      | Chiave primaria     |
+| first_name         | TEXT      | Nome richiedente    |
+| last_name          | TEXT      | Cognome richiedente |
+| email              | TEXT      | Email corporativa   |
+| unit_requested     | TEXT      | Modello richiesto   |
+| deployment_context | TEXT      | Contesto operativo  |
+| created_at         | TIMESTAMP | Data richiesta      |
 
 ---
 
 ## Il Catalogo — Nexus Series
 
-| Modello | Nome | Ruolo | Disponibilità |
-|---|---|---|---|
-| NX-7 | Rachael | Executive Assistant | Limited |
-| NX-8 | Roy | Combat / Security | Classified |
-| NX-8 | Pris | Domestic / Social | Available |
-| NX-9 | K | Field Operations | Limited |
-| NX-9 | Luci | Scientific Research | Available |
-| NX-6 | Leon | Manual Labour / Off-World | Available |
+| Modello | Nome    | Ruolo                     | Disponibilità |
+| ------- | ------- | ------------------------- | ------------- |
+| NX-7    | Rachael | Executive Assistant       | Limited       |
+| NX-8    | Roy     | Combat / Security         | Classified    |
+| NX-8    | Pris    | Domestic / Social         | Available     |
+| NX-9    | K       | Field Operations          | Limited       |
+| NX-9    | Luci    | Scientific Research       | Available     |
+| NX-6    | Leon    | Manual Labour / Off-World | Available     |
 
 ---
 
@@ -145,5 +147,5 @@ Le immagini degli androidi sono generate con AI e salvate nella cartella `images
 
 ---
 
-*© 2049 Tyrell Corporation. All replicants reserved.*  
-*Progetto didattico — Vibe Coding for Design 2026*
+_© 2049 Tyrell Corporation. All replicants reserved._  
+_Progetto didattico — Vibe Coding for Design 2026_
