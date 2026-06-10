@@ -143,9 +143,9 @@ Per un progetto di corso è la scelta più trasparente — ogni riga di codice �
 Offre una REST API immediata senza scrivere un backend. Con la Publishable Key e le RLS policies è possibile esporre le chiamate API direttamente nel frontend in modo sicuro.
 
 **Perché le immagini in locale?**  
-Le immagini degli androidi sono generate con AI e salvate nella cartella `images/`. In una versione futura potrebbero essere caricate su Supabase Storage e referenziate tramite URL pubblico.
+Le immagini degli androidi sono generate da AI (copiate da Pinterest) e salvate nella cartella `images/`. In una versione futura potrebbero essere caricate su Supabase Storage e referenziate tramite URL pubblico.
 
 ---
 
 _© 2049 Tyrell Corporation. All replicants reserved._  
-_Progetto didattico — Vibe Coding for Design 2026_
+_Progetto didattico — Vibe Coding for Design 2026 di NID_
