@@ -38,7 +38,7 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 ## Stack Tecnologico
 
 | Layer      | Tecnologia                          | Note                             |
-| ---------- | ----------------------------------- | -------------------------------- |
+| ---------- | ------------------------------------ | --------------------------------- |
 | Frontend   | HTML5 + CSS3 + JS vanilla           | Zero dipendenze, zero build step |
 | Font       | Orbitron, Share Tech Mono, Rajdhani | Google Fonts                     |
 | Database   | Supabase (PostgreSQL)               | REST API, Row Level Security     |
@@ -51,6 +51,9 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 
 ```
 tyrell-corp/
+├── .github/
+│   └── workflows/
+│       └── keep-alive.yml   ← ping periodico per evitare la pausa Supabase
 ├── index.html       ← tutta la pagina (HTML + CSS + JS in un unico file)
 ├── images/          ← immagini AI degli androidi
 │   ├── rachael.jpg
@@ -75,7 +78,7 @@ Due tabelle in PostgreSQL con Row Level Security abilitata:
 Contiene i dati di tutti gli androidi del catalogo. Lettura pubblica abilitata.
 
 | Colonna        | Tipo | Descrizione                      |
-| -------------- | ---- | -------------------------------- |
+| -------------- | ---- | --------------------------------- |
 | id             | UUID | Chiave primaria                  |
 | series         | TEXT | Es. "NX-9 Series"                |
 | name           | TEXT | Nome dell'androide               |
@@ -92,7 +95,7 @@ Contiene i dati di tutti gli androidi del catalogo. Lettura pubblica abilitata.
 Raccoglie le richieste di acquisto inviate dal form. Solo scrittura pubblica.
 
 | Colonna            | Tipo      | Descrizione         |
-| ------------------ | --------- | ------------------- |
+| ------------------- | --------- | -------------------- |
 | id                 | UUID      | Chiave primaria     |
 | first_name         | TEXT      | Nome richiedente    |
 | last_name          | TEXT      | Cognome richiedente |
@@ -106,7 +109,7 @@ Raccoglie le richieste di acquisto inviate dal form. Solo scrittura pubblica.
 ## Il Catalogo — Nexus Series
 
 | Modello | Nome    | Ruolo                     | Disponibilità |
-| ------- | ------- | ------------------------- | ------------- |
+| ------- | ------- | -------------------------- | -------------- |
 | NX-7    | Rachael | Executive Assistant       | Limited       |
 | NX-8    | Roy     | Combat / Security         | Classified    |
 | NX-8    | Pris    | Domestic / Social         | Available     |
@@ -131,6 +134,45 @@ git add . && git commit -m "descrizione" && git push
 ```
 
 Vercel rileva automaticamente ogni push su `main` e fa il redeploy in ~30 secondi.
+
+---
+
+## Keep-Alive Supabase
+
+Il piano free di Supabase metterà automaticamente **in pausa** il progetto dopo 7 giorni senza attività (e, se la pausa si prolunga troppo, può arrivare alla sospensione). Per evitarlo, il repo include un workflow GitHub Actions che esegue una query di lettura sulla tabella `androids` ogni 3 giorni, mantenendo il progetto attivo.
+
+**File:** `.github/workflows/keep-alive.yml`
+
+```yaml
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 3 */3 * *' # ogni 3 giorni, alle 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping androids table
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.SUPABASE_PROJECT_URL }}/rest/v1/androids?select=id&limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}"
+```
+
+**Secrets richiesti** (Settings → Secrets and variables → Actions del repo):
+
+| Secret                    | Valore                                                                 |
+| -------------------------- | ----------------------------------------------------------------------- |
+| `SUPABASE_PROJECT_URL`     | Project URL (Project Settings → Integrations → Data API)              |
+| `SUPABASE_PUBLISHABLE_KEY` | Publishable key (Project Settings → API Keys) — **mai** la Secret key |
+
+**Se il progetto va in pausa comunque:** dashboard Supabase → progetto → pulsante **"Restore project"**. I dati restano intatti; dopo il restore conviene verificare che il deploy su Vercel risponda ancora (redeploy se necessario).
+
+**Nota:** se il repo resta senza commit per 60+ giorni, GitHub può disabilitare i workflow schedulati — in tal caso basta rilanciarlo manualmente una volta da **Actions → Keep Supabase Alive → Run workflow**.
 
 ---
 
