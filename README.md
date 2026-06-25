@@ -38,7 +38,7 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 ## Stack Tecnologico
 
 | Layer      | Tecnologia                          | Note                             |
-| ---------- | ------------------------------------ | --------------------------------- |
+| ---------- | ----------------------------------- | -------------------------------- |
 | Frontend   | HTML5 + CSS3 + JS vanilla           | Zero dipendenze, zero build step |
 | Font       | Orbitron, Share Tech Mono, Rajdhani | Google Fonts                     |
 | Database   | Supabase (PostgreSQL)               | REST API, Row Level Security     |
@@ -54,8 +54,8 @@ tyrell-corp/
 ├── .github/
 │   └── workflows/
 │       └── keep-alive.yml   ← ping periodico per evitare la pausa Supabase
-├── index.html       ← tutta la pagina (HTML + CSS + JS in un unico file)
-├── images/          ← immagini AI degli androidi
+├── index.html               ← tutta la pagina (HTML + CSS + JS in un unico file)
+├── images/                  ← immagini AI degli androidi
 │   ├── rachael.jpg
 │   ├── roy.jpg
 │   ├── pris.jpg
@@ -78,7 +78,7 @@ Due tabelle in PostgreSQL con Row Level Security abilitata:
 Contiene i dati di tutti gli androidi del catalogo. Lettura pubblica abilitata.
 
 | Colonna        | Tipo | Descrizione                      |
-| -------------- | ---- | --------------------------------- |
+| -------------- | ---- | -------------------------------- |
 | id             | UUID | Chiave primaria                  |
 | series         | TEXT | Es. "NX-9 Series"                |
 | name           | TEXT | Nome dell'androide               |
@@ -95,7 +95,7 @@ Contiene i dati di tutti gli androidi del catalogo. Lettura pubblica abilitata.
 Raccoglie le richieste di acquisto inviate dal form. Solo scrittura pubblica.
 
 | Colonna            | Tipo      | Descrizione         |
-| ------------------- | --------- | -------------------- |
+| ------------------ | --------- | ------------------- |
 | id                 | UUID      | Chiave primaria     |
 | first_name         | TEXT      | Nome richiedente    |
 | last_name          | TEXT      | Cognome richiedente |
@@ -109,7 +109,7 @@ Raccoglie le richieste di acquisto inviate dal form. Solo scrittura pubblica.
 ## Il Catalogo — Nexus Series
 
 | Modello | Nome    | Ruolo                     | Disponibilità |
-| ------- | ------- | -------------------------- | -------------- |
+| ------- | ------- | ------------------------- | ------------- |
 | NX-7    | Rachael | Executive Assistant       | Limited       |
 | NX-8    | Roy     | Combat / Security         | Classified    |
 | NX-8    | Pris    | Domestic / Social         | Available     |
@@ -148,7 +148,7 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: '0 3 */3 * *' # ogni 3 giorni, alle 03:00 UTC
+    - cron: "0 3 */3 * *" # ogni 3 giorni, alle 03:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -165,8 +165,8 @@ jobs:
 
 **Secrets richiesti** (Settings → Secrets and variables → Actions del repo):
 
-| Secret                    | Valore                                                                 |
-| -------------------------- | ----------------------------------------------------------------------- |
+| Secret                     | Valore                                                                |
+| -------------------------- | --------------------------------------------------------------------- |
 | `SUPABASE_PROJECT_URL`     | Project URL (Project Settings → Integrations → Data API)              |
 | `SUPABASE_PUBLISHABLE_KEY` | Publishable key (Project Settings → API Keys) — **mai** la Secret key |
 
