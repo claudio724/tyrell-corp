@@ -7,8 +7,8 @@
 ![HTML](https://img.shields.io/badge/stack-HTML%20%2B%20CSS%20%2B%20JS-f0b429)
 ![GitHub](https://img.shields.io/badge/repo-GitHub-181717?logo=github)
 
-Progetto finale del corso **Vibe Coding for Design 2026 di NID**.  
-Landing page di una società fittizia che produce e vende androidi — ispirata all'universo di **Blade Runner**.
+Progetto finale del corso **Vibe Coding for Design 2026**.  
+Landing page di una società che produce e vende androidi — ispirata all'universo di **Blade Runner**.
 
 🔗 **Live:** [tyrell-corp.vercel.app](https://tyrell-corp.vercel.app)  
 📁 **Repo:** [github.com/claudio724/tyrell-corp](https://github.com/claudio724/tyrell-corp)
@@ -30,6 +30,7 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 - **Catalogo androidi** dinamico — dati caricati da database Supabase
 - **Schede prodotto** con specifiche tecniche, badge disponibilità e immagini AI
 - **Form di acquisizione** funzionante — le richieste vengono salvate nel database
+- **Dashboard amministrativa protetta** — consultazione delle richieste riservata a utenti autenticati
 - **Animazioni scroll** con IntersectionObserver
 - **Design responsive** con griglia CSS adattiva
 
@@ -37,13 +38,14 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 
 ## Stack Tecnologico
 
-| Layer      | Tecnologia                          | Note                             |
-| ---------- | ----------------------------------- | -------------------------------- |
-| Frontend   | HTML5 + CSS3 + JS vanilla           | Zero dipendenze, zero build step |
-| Font       | Orbitron, Share Tech Mono, Rajdhani | Google Fonts                     |
-| Database   | Supabase (PostgreSQL)               | REST API, Row Level Security     |
-| Hosting    | Vercel                              | Deploy automatico da GitHub push |
-| Versioning | Git + GitHub                        | Repository pubblico              |
+| Layer          | Tecnologia                          | Note                             |
+| -------------- | ----------------------------------- | -------------------------------- |
+| Frontend       | HTML5 + CSS3 + JS vanilla           | Zero dipendenze, zero build step |
+| Font           | Orbitron, Share Tech Mono, Rajdhani | Google Fonts                     |
+| Database       | Supabase (PostgreSQL)               | REST API, Row Level Security     |
+| Autenticazione | Supabase Auth                       | Email + password, sessioni JWT   |
+| Hosting        | Vercel                              | Deploy automatico da GitHub push |
+| Versioning     | Git + GitHub                        | Repository pubblico              |
 
 ---
 
@@ -51,11 +53,9 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 
 ```
 tyrell-corp/
-├── .github/
-│   └── workflows/
-│       └── keep-alive.yml   ← ping periodico per evitare la pausa Supabase
-├── index.html               ← tutta la pagina (HTML + CSS + JS in un unico file)
-├── images/                  ← immagini AI degli androidi
+├── index.html       ← landing page pubblica (HTML + CSS + JS)
+├── admin.html       ← dashboard protetta — richiede login
+├── images/          ← immagini AI degli androidi
 │   ├── rachael.jpg
 │   ├── roy.jpg
 │   ├── pris.jpg
@@ -65,7 +65,7 @@ tyrell-corp/
 └── README.md
 ```
 
-La scelta di un **singolo file HTML** è intenzionale: nessun bundler, nessuna dipendenza, deploy immediato su qualsiasi hosting statico.
+La scelta di file HTML singoli per ogni pagina è intenzionale: nessun bundler, nessuna dipendenza, deploy immediato su qualsiasi hosting statico.
 
 ---
 
@@ -75,7 +75,7 @@ Due tabelle in PostgreSQL con Row Level Security abilitata:
 
 ### `androids`
 
-Contiene i dati di tutti gli androidi del catalogo. Lettura pubblica abilitata.
+Contiene i dati di tutti gli androidi del catalogo. **Lettura pubblica** abilitata (il catalogo è visibile a chiunque visiti il sito).
 
 | Colonna        | Tipo | Descrizione                      |
 | -------------- | ---- | -------------------------------- |
@@ -92,7 +92,7 @@ Contiene i dati di tutti gli androidi del catalogo. Lettura pubblica abilitata.
 
 ### `acquisitions`
 
-Raccoglie le richieste di acquisto inviate dal form. Solo scrittura pubblica.
+Raccoglie le richieste di acquisto inviate dal form.
 
 | Colonna            | Tipo      | Descrizione         |
 | ------------------ | --------- | ------------------- |
@@ -103,6 +103,33 @@ Raccoglie le richieste di acquisto inviate dal form. Solo scrittura pubblica.
 | unit_requested     | TEXT      | Modello richiesto   |
 | deployment_context | TEXT      | Contesto operativo  |
 | created_at         | TIMESTAMP | Data richiesta      |
+
+**Permessi:**
+
+- **Scrittura (`INSERT`)**: pubblica — chiunque può inviare il form dal sito
+- **Lettura (`SELECT`)**: riservata agli **utenti autenticati** — solo chi ha effettuato login può consultare le richieste
+
+---
+
+## Autenticazione & Dashboard Admin
+
+Il pulsante **"Admin"** nel menu di navigazione apre un modale di login. Il flusso è gestito interamente da **Supabase Auth**:
+
+1. L'utente inserisce email e password nel modale su `index.html`
+2. Supabase verifica le credenziali e, se corrette, restituisce un token di sessione (JWT)
+3. L'utente viene reindirizzato a `admin.html`
+4. `admin.html` controlla la presenza di una sessione valida (`auth guard`) — in assenza di login, reindirizza automaticamente a `index.html`
+5. Tutte le richieste alla tabella `acquisitions` vengono effettuate includendo il token di sessione, che il database verifica tramite la policy RLS `auth.role() = 'authenticated'`
+6. Un bottone **Logout** in `admin.html` chiude la sessione
+
+Questo significa che i dati sensibili (nomi, email, richieste) **non sono leggibili** da chi non possiede credenziali valide, anche conoscendo l'URL diretto della dashboard o leggendo il codice sorgente della pagina.
+
+### Dashboard — funzionalità
+
+- Contatori totali e per modello androide, cliccabili come filtri rapidi
+- Tabella ordinabile per nome, email, unità richiesta, data
+- Ricerca testuale su nome ed email
+- Refresh manuale dei dati
 
 ---
 
@@ -137,57 +164,30 @@ Vercel rileva automaticamente ogni push su `main` e fa il redeploy in ~30 second
 
 ---
 
-## Keep-Alive Supabase
-
-Il piano free di Supabase metterà automaticamente **in pausa** il progetto dopo 7 giorni senza attività (e, se la pausa si prolunga troppo, può arrivare alla sospensione). Per evitarlo, il repo include un workflow GitHub Actions che esegue una query di lettura sulla tabella `androids` ogni 3 giorni, mantenendo il progetto attivo.
-
-**File:** `.github/workflows/keep-alive.yml`
-
-```yaml
-name: Keep Supabase Alive
-
-on:
-  schedule:
-    - cron: "0 3 */3 * *" # ogni 3 giorni, alle 03:00 UTC
-  workflow_dispatch:
-
-jobs:
-  ping-supabase:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Ping androids table
-        run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-            "${{ secrets.SUPABASE_PROJECT_URL }}/rest/v1/androids?select=id&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}"
-```
-
-**Secrets richiesti** (Settings → Secrets and variables → Actions del repo):
-
-| Secret                     | Valore                                                                |
-| -------------------------- | --------------------------------------------------------------------- |
-| `SUPABASE_PROJECT_URL`     | Project URL (Project Settings → Integrations → Data API)              |
-| `SUPABASE_PUBLISHABLE_KEY` | Publishable key (Project Settings → API Keys) — **mai** la Secret key |
-
-**Se il progetto va in pausa comunque:** dashboard Supabase → progetto → pulsante **"Restore project"**. I dati restano intatti; dopo il restore conviene verificare che il deploy su Vercel risponda ancora (redeploy se necessario).
-
-**Nota:** se il repo resta senza commit per 60+ giorni, GitHub può disabilitare i workflow schedulati — in tal caso basta rilanciarlo manualmente una volta da **Actions → Keep Supabase Alive → Run workflow**.
-
----
-
 ## Scelte Progettuali
 
 **Perché HTML vanilla?**  
 Per un progetto di corso è la scelta più trasparente — ogni riga di codice è visibile e comprensibile senza conoscere framework o toolchain. Facilita anche il deploy: basta un file su qualsiasi hosting statico.
 
 **Perché Supabase?**  
-Offre una REST API immediata senza scrivere un backend. Con la Publishable Key e le RLS policies è possibile esporre le chiamate API direttamente nel frontend in modo sicuro.
+Offre una REST API immediata senza scrivere un backend, oltre a un sistema di autenticazione già pronto (Supabase Auth). Con la Publishable Key, le RLS policies e i token di sessione è possibile costruire un'applicazione sicura interamente lato frontend, senza un server proprietario.
+
+**Perché proteggere solo `acquisitions` e non `androids`?**  
+Il catalogo è contenuto pubblicitario, deve essere visibile a chiunque visiti il sito. Le richieste del form contengono invece dati personali (nomi, email, messaggi) di persone reali — vanno protette da accessi non autorizzati, anche se il sito è ospitato pubblicamente.
 
 **Perché le immagini in locale?**  
-Le immagini degli androidi sono generate da AI (copiate da Pinterest) e salvate nella cartella `images/`. In una versione futura potrebbero essere caricate su Supabase Storage e referenziate tramite URL pubblico.
+Le immagini degli androidi sono generate con AI e salvate nella cartella `images/`. In una versione futura potrebbero essere caricate su Supabase Storage e referenziate tramite URL pubblico.
+
+---
+
+## Possibili Sviluppi Futuri
+
+- Autenticazione a due fattori (MFA) per l'account amministrativo
+- Notifiche email automatiche alla ricezione di una nuova richiesta (Supabase Edge Functions)
+- Stock in tempo reale degli androidi con Supabase Realtime
+- Gestione stato delle richieste (pending / approved / rejected) dalla dashboard
 
 ---
 
 _© 2049 Tyrell Corporation. All replicants reserved._  
-_Progetto didattico — Vibe Coding for Design 2026 di NID_
+_Progetto didattico — Vibe Coding for Design 2026_

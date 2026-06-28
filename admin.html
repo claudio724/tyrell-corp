@@ -1,672 +1,813 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tyrell Corp — Acquisition Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tyrell Corp — Acquisition Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    :root {
-      --gold: #c8960c;
-      --gold-bright: #f0b429;
-      --gold-dim: #7a5c0a;
-      --cyan: #00d4ff;
-      --red: #ff3c3c;
-      --green: #00ff88;
-      --bg-void: #020408;
-      --bg-deep: #060c12;
-      --bg-panel: #0a1420;
-      --bg-card: #0d1a28;
-      --border-dim: rgba(200, 150, 12, 0.15);
-      --border-mid: rgba(200, 150, 12, 0.35);
-      --border-bright: rgba(200, 150, 12, 0.7);
-      --text-primary: #e8dcc8;
-      --text-secondary: #8a7a5a;
-      --text-dim: #4a3a2a;
-      --font-display: 'Orbitron', monospace;
-      --font-mono: 'Share Tech Mono', monospace;
-      --font-body: 'Rajdhani', sans-serif;
-    }
+      :root {
+        --gold: #c8960c;
+        --gold-bright: #f0b429;
+        --gold-dim: #7a5c0a;
+        --cyan: #00d4ff;
+        --red: #ff3c3c;
+        --green: #00ff88;
+        --bg-void: #020408;
+        --bg-deep: #060c12;
+        --bg-panel: #0a1420;
+        --bg-card: #0d1a28;
+        --border-dim: rgba(200, 150, 12, 0.15);
+        --border-mid: rgba(200, 150, 12, 0.35);
+        --border-bright: rgba(200, 150, 12, 0.7);
+        --text-primary: #e8dcc8;
+        --text-secondary: #8a7a5a;
+        --text-dim: #4a3a2a;
+        --font-display: "Orbitron", monospace;
+        --font-mono: "Share Tech Mono", monospace;
+        --font-body: "Rajdhani", sans-serif;
+      }
 
-    html { scroll-behavior: smooth; }
+      html {
+        scroll-behavior: smooth;
+      }
 
-    body {
-      background: var(--bg-void);
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
+      body {
+        background: var(--bg-void);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.6;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg, transparent, transparent 2px,
-        rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.07) 2px,
+          rgba(0, 0, 0, 0.07) 4px
+        );
+        pointer-events: none;
+        z-index: 9999;
+      }
 
-    /* ── NAV ── */
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 3rem;
-      height: 64px;
-      background: rgba(2,4,8,0.95);
-      border-bottom: 1px solid var(--border-dim);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+      /* ── NAV ── */
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 3rem;
+        height: 64px;
+        background: rgba(2, 4, 8, 0.95);
+        border-bottom: 1px solid var(--border-dim);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
 
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 0.85rem;
-      font-weight: 900;
-      letter-spacing: 0.3em;
-      color: var(--gold-bright);
-      text-transform: uppercase;
-      text-decoration: none;
-    }
+      .nav-logo {
+        font-family: var(--font-display);
+        font-size: 0.85rem;
+        font-weight: 900;
+        letter-spacing: 0.3em;
+        color: var(--gold-bright);
+        text-transform: uppercase;
+        text-decoration: none;
+      }
 
-    .nav-logo span { color: var(--text-secondary); font-weight: 400; }
+      .nav-logo span {
+        color: var(--text-secondary);
+        font-weight: 400;
+      }
 
-    .nav-badge {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.8rem;
-      border: 1px solid var(--red);
-      color: var(--red);
-    }
+      .nav-badge {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.8rem;
+        border: 1px solid var(--red);
+        color: var(--red);
+      }
 
-    .nav-back {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-back:hover { color: var(--gold-bright); }
+      .nav-back {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .nav-back:hover {
+        color: var(--gold-bright);
+      }
 
-    /* ── LAYOUT ── */
-    .dashboard {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 3rem;
-    }
+      /* ── LAYOUT ── */
+      .dashboard {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 3rem;
+      }
 
-    /* ── HEADER ── */
-    .dash-header {
-      margin-bottom: 3rem;
-    }
+      /* ── HEADER ── */
+      .dash-header {
+        margin-bottom: 3rem;
+      }
 
-    .dash-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
-      color: var(--cyan);
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+      .dash-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.3em;
+        color: var(--cyan);
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
 
-    .dash-eyebrow::before {
-      content: '';
-      width: 24px; height: 1px;
-      background: var(--cyan);
-      display: inline-block;
-    }
+      .dash-eyebrow::before {
+        content: "";
+        width: 24px;
+        height: 1px;
+        background: var(--cyan);
+        display: inline-block;
+      }
 
-    .dash-title {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
-    }
+      .dash-title {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
 
-    .dash-title span { color: var(--gold-bright); }
+      .dash-title span {
+        color: var(--gold-bright);
+      }
 
-    .dash-subtitle {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
+      .dash-subtitle {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
 
-    /* ── STATS ── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1px;
-      margin-bottom: 3rem;
-      border: 1px solid var(--border-dim);
-    }
+      /* ── STATS ── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1px;
+        margin-bottom: 3rem;
+        border: 1px solid var(--border-dim);
+      }
 
-    .stat-card {
-      background: var(--bg-card);
-      padding: 1.5rem;
-      border-right: 1px solid var(--border-dim);
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+      .stat-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-right: 1px solid var(--border-dim);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
 
-    .stat-card:hover { background: rgba(200,150,12,0.05); }
-    .stat-card.active { background: rgba(200,150,12,0.08); border-bottom: 2px solid var(--gold-bright); }
+      .stat-card:hover {
+        background: rgba(200, 150, 12, 0.05);
+      }
+      .stat-card.active {
+        background: rgba(200, 150, 12, 0.08);
+        border-bottom: 2px solid var(--gold-bright);
+      }
 
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-    }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold-dim),
+          transparent
+        );
+      }
 
-    .stat-number {
-      font-family: var(--font-display);
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: var(--gold-bright);
-      line-height: 1;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
+      .stat-number {
+        font-family: var(--font-display);
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--gold-bright);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
 
-    .stat-label {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      display: block;
-    }
+      .stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        display: block;
+      }
 
-    .stat-unit {
-      font-family: var(--font-mono);
-      font-size: 0.55rem;
-      letter-spacing: 0.15em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      display: block;
-      margin-top: 0.2rem;
-    }
+      .stat-unit {
+        font-family: var(--font-mono);
+        font-size: 0.55rem;
+        letter-spacing: 0.15em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        display: block;
+        margin-top: 0.2rem;
+      }
 
-    /* ── FILTERS ── */
-    .filters-bar {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
+      /* ── FILTERS ── */
+      .filters-bar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
 
-    .filter-label {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
+      .filter-label {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
 
-    .filter-btn {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 0.4rem 1rem;
-      background: transparent;
-      border: 1px solid var(--border-dim);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+      .filter-btn {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        padding: 0.4rem 1rem;
+        background: transparent;
+        border: 1px solid var(--border-dim);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
 
-    .filter-btn:hover { border-color: var(--gold-dim); color: var(--gold-bright); }
-    .filter-btn.active { border-color: var(--gold-bright); color: var(--gold-bright); background: rgba(200,150,12,0.08); }
+      .filter-btn:hover {
+        border-color: var(--gold-dim);
+        color: var(--gold-bright);
+      }
+      .filter-btn.active {
+        border-color: var(--gold-bright);
+        color: var(--gold-bright);
+        background: rgba(200, 150, 12, 0.08);
+      }
 
-    .search-input {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      padding: 0.4rem 1rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border-dim);
-      color: var(--text-primary);
-      outline: none;
-      margin-left: auto;
-      width: 220px;
-      transition: border-color 0.2s;
-    }
+      .search-input {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-dim);
+        color: var(--text-primary);
+        outline: none;
+        margin-left: auto;
+        width: 220px;
+        transition: border-color 0.2s;
+      }
 
-    .search-input:focus { border-color: var(--gold-dim); }
-    .search-input::placeholder { color: var(--text-dim); }
+      .search-input:focus {
+        border-color: var(--gold-dim);
+      }
+      .search-input::placeholder {
+        color: var(--text-dim);
+      }
 
-    /* ── TABLE ── */
-    .table-wrap {
-      border: 1px solid var(--border-dim);
-      overflow-x: auto;
-    }
+      /* ── TABLE ── */
+      .table-wrap {
+        border: 1px solid var(--border-dim);
+        overflow-x: auto;
+      }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    thead {
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--border-mid);
-    }
+      thead {
+        background: var(--bg-panel);
+        border-bottom: 1px solid var(--border-mid);
+      }
 
-    th {
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      padding: 1rem 1.25rem;
-      text-align: left;
-      white-space: nowrap;
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.2s;
-    }
+      th {
+        font-family: var(--font-mono);
+        font-size: 0.58rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        padding: 1rem 1.25rem;
+        text-align: left;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.2s;
+      }
 
-    th:hover { color: var(--gold-bright); }
-    th.sorted { color: var(--gold-bright); }
-    th .sort-arrow { margin-left: 0.4rem; opacity: 0.5; }
-    th.sorted .sort-arrow { opacity: 1; }
+      th:hover {
+        color: var(--gold-bright);
+      }
+      th.sorted {
+        color: var(--gold-bright);
+      }
+      th .sort-arrow {
+        margin-left: 0.4rem;
+        opacity: 0.5;
+      }
+      th.sorted .sort-arrow {
+        opacity: 1;
+      }
 
-    tbody tr {
-      border-bottom: 1px solid var(--border-dim);
-      transition: background 0.2s;
-    }
+      tbody tr {
+        border-bottom: 1px solid var(--border-dim);
+        transition: background 0.2s;
+      }
 
-    tbody tr:hover { background: rgba(200,150,12,0.04); }
-    tbody tr:last-child { border-bottom: none; }
+      tbody tr:hover {
+        background: rgba(200, 150, 12, 0.04);
+      }
+      tbody tr:last-child {
+        border-bottom: none;
+      }
 
-    td {
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      padding: 1rem 1.25rem;
-      vertical-align: middle;
-    }
+      td {
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+      }
 
-    td.td-name {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
+      td.td-name {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
 
-    td.td-email {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--cyan);
-    }
+      td.td-email {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--cyan);
+      }
 
-    td.td-unit {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--gold-bright);
-    }
+      td.td-unit {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--gold-bright);
+      }
 
-    td.td-date {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      white-space: nowrap;
-    }
+      td.td-date {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        white-space: nowrap;
+      }
 
-    td.td-id {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      color: var(--text-dim);
-    }
+      td.td-id {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        color: var(--text-dim);
+      }
 
-    .td-context {
-      max-width: 280px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-    }
+      .td-context {
+        max-width: 280px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
 
-    /* ── EMPTY / LOADING ── */
-    .table-message {
-      padding: 4rem 2rem;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
+      /* ── EMPTY / LOADING ── */
+      .table-message {
+        padding: 4rem 2rem;
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
 
-    /* ── FOOTER ── */
-    .dash-footer {
-      margin-top: 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border-dim);
-    }
+      /* ── FOOTER ── */
+      .dash-footer {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-dim);
+      }
 
-    .dash-footer-text {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
+      .dash-footer-text {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.15em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
 
-    .refresh-btn {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 0.4rem 1rem;
-      background: transparent;
-      border: 1px solid var(--border-dim);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+      .refresh-btn {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 0.4rem 1rem;
+        background: transparent;
+        border: 1px solid var(--border-dim);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
 
-    .refresh-btn:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
+      .refresh-btn:hover {
+        border-color: var(--gold-bright);
+        color: var(--gold-bright);
+      }
 
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-void); }
-    ::-webkit-scrollbar-thumb { background: var(--gold-dim); }
-    ::-webkit-scrollbar-thumb:hover { background: var(--gold-bright); }
-  </style>
-</head>
-<body>
+      /* ── SCROLLBAR ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-void);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--gold-dim);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--gold-bright);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html" class="nav-back">← Back to Site</a>
+      <a href="index.html" class="nav-logo">Tyrell <span>Corp</span></a>
+      <button
+        class="nav-badge"
+        id="logout-btn"
+        style="cursor: pointer; background: transparent"
+      >
+        Logout
+      </button>
+    </nav>
 
-<nav>
-  <a href="index.html" class="nav-back">← Back to Site</a>
-  <a href="index.html" class="nav-logo">Tyrell <span>Corp</span></a>
-  <span class="nav-badge">Internal Access</span>
-</nav>
+    <div class="dashboard">
+      <div class="dash-header">
+        <div class="dash-eyebrow">Acquisition Management System</div>
+        <h1 class="dash-title">Unit <span>Requests</span></h1>
+        <p class="dash-subtitle" id="last-updated">Loading data...</p>
+      </div>
 
-<div class="dashboard">
+      <!-- STATS -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card active" data-filter="all">
+          <span class="stat-number" id="stat-total">—</span>
+          <span class="stat-label">Total Requests</span>
+          <span class="stat-unit">All units</span>
+        </div>
+      </div>
 
-  <div class="dash-header">
-    <div class="dash-eyebrow">Acquisition Management System</div>
-    <h1 class="dash-title">Unit <span>Requests</span></h1>
-    <p class="dash-subtitle" id="last-updated">Loading data...</p>
-  </div>
+      <!-- FILTERS -->
+      <div class="filters-bar">
+        <span class="filter-label">Filter:</span>
+        <button class="filter-btn active" data-filter="all">All</button>
+        <div id="unit-filters"></div>
+        <input
+          class="search-input"
+          type="text"
+          id="search-input"
+          placeholder="Search name or email..."
+        />
+      </div>
 
-  <!-- STATS -->
-  <div class="stats-grid" id="stats-grid">
-    <div class="stat-card active" data-filter="all">
-      <span class="stat-number" id="stat-total">—</span>
-      <span class="stat-label">Total Requests</span>
-      <span class="stat-unit">All units</span>
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-col="name" class="sorted">
+                Name <span class="sort-arrow">↑</span>
+              </th>
+              <th data-col="email">Email</th>
+              <th data-col="unit">Unit Requested</th>
+              <th data-col="context">Deployment Context</th>
+              <th data-col="date">Date <span class="sort-arrow"></span></th>
+              <th data-col="id">ID</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr>
+              <td colspan="6" class="table-message">Loading acquisitions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dash-footer">
+        <span class="dash-footer-text" id="row-count">— records</span>
+        <button class="refresh-btn" id="refresh-btn">↺ Refresh</button>
+      </div>
     </div>
-  </div>
 
-  <!-- FILTERS -->
-  <div class="filters-bar">
-    <span class="filter-label">Filter:</span>
-    <button class="filter-btn active" data-filter="all">All</button>
-    <div id="unit-filters"></div>
-    <input class="search-input" type="text" id="search-input" placeholder="Search name or email..." />
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script>
+      const SUPABASE_URL = "https://jhftgebpynvtekrgftnr.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_9Mhe8vut0WBV2n2gedN57Q_kWn8TOvS";
 
-  <!-- TABLE -->
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th data-col="name" class="sorted">Name <span class="sort-arrow">↑</span></th>
-          <th data-col="email">Email</th>
-          <th data-col="unit">Unit Requested</th>
-          <th data-col="context">Deployment Context</th>
-          <th data-col="date">Date <span class="sort-arrow"></span></th>
-          <th data-col="id">ID</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
-        <tr><td colspan="6" class="table-message">Loading acquisitions...</td></tr>
-      </tbody>
-    </table>
-  </div>
+      let allData = [];
+      let currentFilter = "all";
+      let currentSort = { col: "date", dir: "desc" };
+      let searchQuery = "";
 
-  <div class="dash-footer">
-    <span class="dash-footer-text" id="row-count">— records</span>
-    <button class="refresh-btn" id="refresh-btn">↺ Refresh</button>
-  </div>
+      /* ── FETCH ── */
+      async function fetchData() {
+        document.getElementById("table-body").innerHTML =
+          '<tr><td colspan="6" class="table-message">Loading acquisitions...</td></tr>';
 
-</div>
+        try {
+          const { data: sessionData } = await supabaseClient.auth.getSession();
+          const accessToken = sessionData.session.access_token;
 
-<script>
-  const SUPABASE_URL = 'https://jhftgebpynvtekrgftnr.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_9Mhe8vut0WBV2n2gedN57Q_kWn8TOvS';
-
-  let allData = [];
-  let currentFilter = 'all';
-  let currentSort = { col: 'date', dir: 'desc' };
-  let searchQuery = '';
-
-  /* ── FETCH ── */
-  async function fetchData() {
-    document.getElementById('table-body').innerHTML =
-      '<tr><td colspan="6" class="table-message">Loading acquisitions...</td></tr>';
-
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/acquisitions?order=created_at.desc`, {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
+          const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/acquisitions?order=created_at.desc`,
+            {
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${accessToken}`,
+              },
+            },
+          );
+          allData = await res.json();
+          renderAll();
+          document.getElementById("last-updated").textContent =
+            "Last updated: " + new Date().toLocaleString("it-IT");
+        } catch (err) {
+          document.getElementById("table-body").innerHTML =
+            '<tr><td colspan="6" class="table-message" style="color:var(--red)">Error: unable to connect to database</td></tr>';
         }
-      });
-      allData = await res.json();
-      renderAll();
-      document.getElementById('last-updated').textContent =
-        'Last updated: ' + new Date().toLocaleString('it-IT');
-    } catch (err) {
-      document.getElementById('table-body').innerHTML =
-        '<tr><td colspan="6" class="table-message" style="color:var(--red)">Error: unable to connect to database</td></tr>';
-    }
-  }
+      }
 
-  /* ── STATS ── */
-  function renderStats() {
-    const total = allData.length;
-    document.getElementById('stat-total').textContent = total;
+      /* ── STATS ── */
+      function renderStats() {
+        const total = allData.length;
+        document.getElementById("stat-total").textContent = total;
 
-    // Count per unit
-    const counts = {};
-    allData.forEach(r => {
-      const unit = r.unit_requested || 'Unspecified';
-      counts[unit] = (counts[unit] || 0) + 1;
-    });
+        // Count per unit
+        const counts = {};
+        allData.forEach((r) => {
+          const unit = r.unit_requested || "Unspecified";
+          counts[unit] = (counts[unit] || 0) + 1;
+        });
 
-    const grid = document.getElementById('stats-grid');
-    // Remove old unit cards
-    Array.from(grid.querySelectorAll('.stat-card:not(:first-child)')).forEach(el => el.remove());
+        const grid = document.getElementById("stats-grid");
+        // Remove old unit cards
+        Array.from(
+          grid.querySelectorAll(".stat-card:not(:first-child)"),
+        ).forEach((el) => el.remove());
 
-    Object.entries(counts).sort((a,b) => b[1]-a[1]).forEach(([unit, count]) => {
-      const card = document.createElement('div');
-      card.className = 'stat-card';
-      card.dataset.filter = unit;
-      const shortUnit = unit.replace('NX-', '').split('—')[0].trim();
-      card.innerHTML = `
+        Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .forEach(([unit, count]) => {
+            const card = document.createElement("div");
+            card.className = "stat-card";
+            card.dataset.filter = unit;
+            const shortUnit = unit.replace("NX-", "").split("—")[0].trim();
+            card.innerHTML = `
         <span class="stat-number">${count}</span>
         <span class="stat-label">${shortUnit}</span>
         <span class="stat-unit">requests</span>
       `;
-      card.addEventListener('click', () => setFilter(unit, card));
-      grid.appendChild(card);
-    });
+            card.addEventListener("click", () => setFilter(unit, card));
+            grid.appendChild(card);
+          });
 
-    // Re-attach all filter
-    grid.querySelector('[data-filter="all"]').addEventListener('click', function() {
-      setFilter('all', this);
-    });
-  }
-
-  /* ── FILTER BUTTONS ── */
-  function renderFilterButtons() {
-    const units = [...new Set(allData.map(r => r.unit_requested).filter(Boolean))];
-    const container = document.getElementById('unit-filters');
-    container.innerHTML = '';
-    units.forEach(unit => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn';
-      btn.dataset.filter = unit;
-      btn.textContent = unit.replace('NX-', '').split('—')[0].trim();
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        setFilter(unit, null);
-      });
-      container.appendChild(btn);
-    });
-  }
-
-  function setFilter(filter, cardEl) {
-    currentFilter = filter;
-    // Update stat cards
-    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
-    if (cardEl) cardEl.classList.add('active');
-    // Update filter buttons
-    document.querySelectorAll('.filter-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.filter === filter || (filter === 'all' && b.dataset.filter === 'all'));
-    });
-    renderTable();
-  }
-
-  /* ── TABLE ── */
-  function getFiltered() {
-    let data = [...allData];
-
-    if (currentFilter !== 'all') {
-      data = data.filter(r => r.unit_requested === currentFilter);
-    }
-
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      data = data.filter(r =>
-        (r.first_name + ' ' + r.last_name).toLowerCase().includes(q) ||
-        (r.email || '').toLowerCase().includes(q)
-      );
-    }
-
-    data.sort((a, b) => {
-      let va, vb;
-      if (currentSort.col === 'name') {
-        va = (a.first_name + a.last_name).toLowerCase();
-        vb = (b.first_name + b.last_name).toLowerCase();
-      } else if (currentSort.col === 'email') {
-        va = (a.email || '').toLowerCase();
-        vb = (b.email || '').toLowerCase();
-      } else if (currentSort.col === 'unit') {
-        va = (a.unit_requested || '').toLowerCase();
-        vb = (b.unit_requested || '').toLowerCase();
-      } else {
-        va = a.created_at || '';
-        vb = b.created_at || '';
+        // Re-attach all filter
+        grid
+          .querySelector('[data-filter="all"]')
+          .addEventListener("click", function () {
+            setFilter("all", this);
+          });
       }
-      if (va < vb) return currentSort.dir === 'asc' ? -1 : 1;
-      if (va > vb) return currentSort.dir === 'asc' ? 1 : -1;
-      return 0;
-    });
 
-    return data;
-  }
+      /* ── FILTER BUTTONS ── */
+      function renderFilterButtons() {
+        const units = [
+          ...new Set(allData.map((r) => r.unit_requested).filter(Boolean)),
+        ];
+        const container = document.getElementById("unit-filters");
+        container.innerHTML = "";
+        units.forEach((unit) => {
+          const btn = document.createElement("button");
+          btn.className = "filter-btn";
+          btn.dataset.filter = unit;
+          btn.textContent = unit.replace("NX-", "").split("—")[0].trim();
+          btn.addEventListener("click", () => {
+            document
+              .querySelectorAll(".filter-btn")
+              .forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            setFilter(unit, null);
+          });
+          container.appendChild(btn);
+        });
+      }
 
-  function renderTable() {
-    const data = getFiltered();
-    const tbody = document.getElementById('table-body');
-    document.getElementById('row-count').textContent = `${data.length} record${data.length !== 1 ? 's' : ''}`;
+      function setFilter(filter, cardEl) {
+        currentFilter = filter;
+        // Update stat cards
+        document
+          .querySelectorAll(".stat-card")
+          .forEach((c) => c.classList.remove("active"));
+        if (cardEl) cardEl.classList.add("active");
+        // Update filter buttons
+        document.querySelectorAll(".filter-btn").forEach((b) => {
+          b.classList.toggle(
+            "active",
+            b.dataset.filter === filter ||
+              (filter === "all" && b.dataset.filter === "all"),
+          );
+        });
+        renderTable();
+      }
 
-    if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="table-message">No records found</td></tr>';
-      return;
-    }
+      /* ── TABLE ── */
+      function getFiltered() {
+        let data = [...allData];
 
-    tbody.innerHTML = data.map(r => {
-      const date = r.created_at
-        ? new Date(r.created_at).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
-        : '—';
-      const shortId = r.id ? r.id.split('-')[0].toUpperCase() : '—';
-      return `
+        if (currentFilter !== "all") {
+          data = data.filter((r) => r.unit_requested === currentFilter);
+        }
+
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          data = data.filter(
+            (r) =>
+              (r.first_name + " " + r.last_name).toLowerCase().includes(q) ||
+              (r.email || "").toLowerCase().includes(q),
+          );
+        }
+
+        data.sort((a, b) => {
+          let va, vb;
+          if (currentSort.col === "name") {
+            va = (a.first_name + a.last_name).toLowerCase();
+            vb = (b.first_name + b.last_name).toLowerCase();
+          } else if (currentSort.col === "email") {
+            va = (a.email || "").toLowerCase();
+            vb = (b.email || "").toLowerCase();
+          } else if (currentSort.col === "unit") {
+            va = (a.unit_requested || "").toLowerCase();
+            vb = (b.unit_requested || "").toLowerCase();
+          } else {
+            va = a.created_at || "";
+            vb = b.created_at || "";
+          }
+          if (va < vb) return currentSort.dir === "asc" ? -1 : 1;
+          if (va > vb) return currentSort.dir === "asc" ? 1 : -1;
+          return 0;
+        });
+
+        return data;
+      }
+
+      function renderTable() {
+        const data = getFiltered();
+        const tbody = document.getElementById("table-body");
+        document.getElementById("row-count").textContent =
+          `${data.length} record${data.length !== 1 ? "s" : ""}`;
+
+        if (data.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="table-message">No records found</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data
+          .map((r) => {
+            const date = r.created_at
+              ? new Date(r.created_at).toLocaleDateString("it-IT", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "—";
+            const shortId = r.id ? r.id.split("-")[0].toUpperCase() : "—";
+            return `
         <tr>
-          <td class="td-name">${r.first_name || ''} ${r.last_name || ''}</td>
-          <td class="td-email">${r.email || '—'}</td>
-          <td class="td-unit">${r.unit_requested || '—'}</td>
-          <td><div class="td-context" title="${r.deployment_context || ''}">${r.deployment_context || '—'}</div></td>
+          <td class="td-name">${r.first_name || ""} ${r.last_name || ""}</td>
+          <td class="td-email">${r.email || "—"}</td>
+          <td class="td-unit">${r.unit_requested || "—"}</td>
+          <td><div class="td-context" title="${r.deployment_context || ""}">${r.deployment_context || "—"}</div></td>
           <td class="td-date">${date}</td>
           <td class="td-id">${shortId}</td>
         </tr>
       `;
-    }).join('');
-  }
-
-  function renderAll() {
-    renderStats();
-    renderFilterButtons();
-    renderTable();
-  }
-
-  /* ── SORT ── */
-  document.querySelectorAll('th[data-col]').forEach(th => {
-    th.addEventListener('click', () => {
-      const col = th.dataset.col;
-      if (currentSort.col === col) {
-        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentSort.col = col;
-        currentSort.dir = 'asc';
+          })
+          .join("");
       }
-      document.querySelectorAll('th').forEach(t => {
-        t.classList.remove('sorted');
-        const arrow = t.querySelector('.sort-arrow');
-        if (arrow) arrow.textContent = '';
+
+      function renderAll() {
+        renderStats();
+        renderFilterButtons();
+        renderTable();
+      }
+
+      /* ── SORT ── */
+      document.querySelectorAll("th[data-col]").forEach((th) => {
+        th.addEventListener("click", () => {
+          const col = th.dataset.col;
+          if (currentSort.col === col) {
+            currentSort.dir = currentSort.dir === "asc" ? "desc" : "asc";
+          } else {
+            currentSort.col = col;
+            currentSort.dir = "asc";
+          }
+          document.querySelectorAll("th").forEach((t) => {
+            t.classList.remove("sorted");
+            const arrow = t.querySelector(".sort-arrow");
+            if (arrow) arrow.textContent = "";
+          });
+          th.classList.add("sorted");
+          const arrow = th.querySelector(".sort-arrow");
+          if (arrow) arrow.textContent = currentSort.dir === "asc" ? "↑" : "↓";
+          renderTable();
+        });
       });
-      th.classList.add('sorted');
-      const arrow = th.querySelector('.sort-arrow');
-      if (arrow) arrow.textContent = currentSort.dir === 'asc' ? '↑' : '↓';
-      renderTable();
-    });
-  });
 
-  /* ── SEARCH ── */
-  document.getElementById('search-input').addEventListener('input', e => {
-    searchQuery = e.target.value.trim();
-    renderTable();
-  });
+      /* ── SEARCH ── */
+      document.getElementById("search-input").addEventListener("input", (e) => {
+        searchQuery = e.target.value.trim();
+        renderTable();
+      });
 
-  /* ── REFRESH ── */
-  document.getElementById('refresh-btn').addEventListener('click', fetchData);
+      /* ── REFRESH ── */
+      document
+        .getElementById("refresh-btn")
+        .addEventListener("click", fetchData);
 
-  /* ── INIT ── */
-  fetchData();
-</script>
-</body>
+      /* ── SUPABASE AUTH CLIENT ── */
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      /* ── AUTH GUARD ── */
+      async function checkAuth() {
+        const { data } = await supabaseClient.auth.getSession();
+        if (!data.session) {
+          window.location.href = "index.html";
+          return false;
+        }
+        return true;
+      }
+
+      /* ── LOGOUT ── */
+      async function logout() {
+        await supabaseClient.auth.signOut();
+        window.location.href = "index.html";
+      }
+
+      /* ── INIT ── */
+      document.getElementById("logout-btn").addEventListener("click", logout);
+      (async () => {
+        const authed = await checkAuth();
+        if (authed) fetchData();
+      })();
+    </script>
+  </body>
 </html>
