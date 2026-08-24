@@ -146,6 +146,16 @@ Questo significa che i dati sensibili (nomi, email, richieste) **non sono leggib
 
 ---
 
+## Keep-Alive Supabase
+
+Il piano gratuito di Supabase mette in pausa i progetti dopo 7 giorni senza attività. Un workflow GitHub Actions (`.github/workflows/keep-alive.yml`) esegue un ping ogni 3 giorni per evitarlo.
+
+Il primo tentativo faceva una semplice `SELECT` sulla tabella `androids`: rispondeva sempre 200, ma Supabase continuava a inviare avvisi "is going to be paused" — una lettura pubblica non viene conteggiata come attività sufficiente. Il workflow ora esegue invece una scrittura reale (`INSERT`) su una tabella dedicata `keepalive` (schema in `supabase/keepalive.sql`, da eseguire una volta nello SQL Editor di Supabase), e verifica esplicitamente il codice HTTP restituito, fallendo in modo visibile se il ping non va a buon fine.
+
+Secrets richiesti nel repo GitHub (`Settings → Secrets and variables → Actions`): `SUPABASE_PROJECT_URL`, `SUPABASE_PUBLISHABLE_KEY`.
+
+---
+
 ## Deploy
 
 Il progetto usa un workflow **Git → GitHub → Vercel**:

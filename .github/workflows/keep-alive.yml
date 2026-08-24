@@ -9,9 +9,18 @@ jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping androids table
+      - name: Write heartbeat row
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-            "${{ secrets.SUPABASE_PROJECT_URL }}/rest/v1/androids?select=id&limit=1" \
+          http_code=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST "${{ secrets.SUPABASE_PROJECT_URL }}/rest/v1/keepalive" \
             -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}"
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d '{}')
+          echo "Supabase responded with HTTP $http_code"
+          cat /tmp/response.json
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::Keep-alive write failed (HTTP $http_code) - check SUPABASE_PROJECT_URL/SUPABASE_PUBLISHABLE_KEY secrets and the keepalive table/RLS policy (see supabase/keepalive.sql)."
+            exit 1
+          fi
