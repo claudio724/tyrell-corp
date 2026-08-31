@@ -2,25 +2,67 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: '0 3 */3 * *'  # ogni 3 giorni, alle 03:00 UTC
-  workflow_dispatch:  # ti permette di lanciarlo manualmente da GitHub per testare
+    # Due volte al giorno (03:00 e 15:00 UTC). GitHub ritarda spesso i cron
+    # di 30-90 minuti nelle ore di punta: due slot danno ridondanza.
+    - cron: '0 3,15 * * *'
+  workflow_dispatch:  # esecuzione manuale da GitHub per testare
 
 jobs:
   ping-supabase:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
     steps:
-      - name: Write heartbeat row
+      - name: Check secrets are configured
         run: |
-          http_code=$(curl -s -o /tmp/response.json -w "%{http_code}" \
-            -X POST "${{ secrets.SUPABASE_PROJECT_URL }}/rest/v1/keepalive" \
-            -H "apikey: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" \
-            -H "Content-Type: application/json" \
-            -H "Prefer: return=minimal" \
-            -d '{}')
-          echo "Supabase responded with HTTP $http_code"
-          cat /tmp/response.json
-          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
-            echo "::error::Keep-alive write failed (HTTP $http_code) - check SUPABASE_PROJECT_URL/SUPABASE_PUBLISHABLE_KEY secrets and the keepalive table/RLS policy (see supabase/keepalive.sql)."
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "::error::Secrets mancanti. Imposta SUPABASE_PROJECT_URL e SUPABASE_PUBLISHABLE_KEY in Settings -> Secrets and variables -> Actions."
             exit 1
           fi
+          # Il project ref non è un segreto (è pubblico in index.html): stamparlo
+          # rende le run auto-diagnosticabili se il secret puntasse al progetto sbagliato.
+          echo "Progetto: $(echo "$SUPABASE_URL" | sed -E 's#https?://([^.]+)\..*#\1#')"
+
+      - name: Ping Supabase (write + read)
+        run: |
+          set -u
+          fail=0
+
+          call() {
+            label="$1"; shift
+            http_code=$(curl -s -o /tmp/response.json -w "%{http_code}" "$@")
+            echo "  $label -> HTTP $http_code"
+            if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+              echo "::error::$label fallito (HTTP $http_code): $(cat /tmp/response.json)"
+              fail=1
+            fi
+          }
+
+          # Scrittura reale: è il segnale di attività che Supabase registra
+          # in modo più affidabile rispetto a una semplice lettura pubblica.
+          call "INSERT keepalive" \
+            -X POST "$SUPABASE_URL/rest/v1/keepalive" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d '{}'
+
+          # Letture: aggiungono traffico API "realistico" oltre alla scrittura.
+          call "SELECT androids" \
+            "$SUPABASE_URL/rest/v1/androids?select=id,name&limit=10" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY"
+
+          call "COUNT androids" \
+            -I "$SUPABASE_URL/rest/v1/androids?select=id" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "Prefer: count=exact"
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::Keep-alive fallito. Controlla i secrets e la tabella/policy keepalive (vedi supabase/keepalive.sql)."
+            exit 1
+          fi
+          echo "Keep-alive completato con successo."

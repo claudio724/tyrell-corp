@@ -148,11 +148,19 @@ Questo significa che i dati sensibili (nomi, email, richieste) **non sono leggib
 
 ## Keep-Alive Supabase
 
-Il piano gratuito di Supabase mette in pausa i progetti dopo 7 giorni senza attività. Un workflow GitHub Actions (`.github/workflows/keep-alive.yml`) esegue un ping ogni 3 giorni per evitarlo.
+Il piano gratuito di Supabase mette in pausa i progetti dopo 7 giorni senza attività. Un workflow GitHub Actions (`.github/workflows/keep-alive.yml`) tiene sveglio il database con ping periodici.
 
-Il primo tentativo faceva una semplice `SELECT` sulla tabella `androids`: rispondeva sempre 200, ma Supabase continuava a inviare avvisi "is going to be paused" — una lettura pubblica non viene conteggiata come attività sufficiente. Il workflow ora esegue invece una scrittura reale (`INSERT`) su una tabella dedicata `keepalive` (schema in `supabase/keepalive.sql`, da eseguire una volta nello SQL Editor di Supabase), e verifica esplicitamente il codice HTTP restituito, fallendo in modo visibile se il ping non va a buon fine.
+La soluzione è arrivata in tre passaggi, ognuno risolve un limite del precedente:
+
+1. **`SELECT` ogni 3 giorni** — rispondeva sempre 200, ma continuavano ad arrivare avvisi "is going to be paused". Una lettura pubblica da sola non basta.
+2. **`INSERT` ogni 3 giorni** — una scrittura reale su una tabella dedicata `keepalive` (schema in `supabase/keepalive.sql`, da eseguire una volta nello SQL Editor). Meglio, ma gli avvisi sono continuati: Supabase non controlla se esiste _almeno una_ richiesta, valuta il **volume** di traffico. Due richieste a settimana restano sotto la sua soglia di "sufficient activity".
+3. **Ping due volte al giorno, scrittura + letture** — la configurazione attuale. Ogni run fa un `INSERT` su `keepalive`, una `SELECT` su `androids` e una richiesta di conteggio: circa 42 richieste a settimana invece di 2.
+
+Il workflow verifica il codice HTTP di ogni chiamata e fallisce in modo visibile se una non va a buon fine, così una run verde significa davvero che il database ha risposto. Stampa anche il project ref che sta contattando, per accorgersi subito se un secret puntasse al progetto sbagliato.
 
 Secrets richiesti nel repo GitHub (`Settings → Secrets and variables → Actions`): `SUPABASE_PROJECT_URL`, `SUPABASE_PUBLISHABLE_KEY`.
+
+> ⚠️ **Attenzione:** GitHub disattiva automaticamente i workflow schedulati dopo **60 giorni senza commit** sul repository (avvisa via email prima di farlo). Se il progetto resta fermo a lungo, basta un commit qualsiasi per riattivare il cron.
 
 ---
 
