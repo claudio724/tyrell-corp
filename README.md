@@ -53,8 +53,12 @@ L'estetica scelta è **neo-noir industriale**: palette scura con accenti oro/amb
 
 ```
 tyrell-corp/
-├── index.html       ← landing page pubblica (HTML + CSS + JS)
+├── index.html       ← landing page pubblica (HTML + CSS)
 ├── admin.html       ← dashboard protetta — richiede login
+├── js/
+│   ├── app.js       ← logica della landing page
+│   └── admin.js     ← logica della dashboard
+├── vercel.json      ← security headers (CSP)
 ├── images/          ← immagini AI degli androidi
 │   ├── rachael.jpg
 │   ├── roy.jpg
@@ -65,7 +69,10 @@ tyrell-corp/
 └── README.md
 ```
 
-La scelta di file HTML singoli per ogni pagina è intenzionale: nessun bundler, nessuna dipendenza, deploy immediato su qualsiasi hosting statico.
+Una pagina, un file HTML: nessun bundler, nessuna dipendenza da installare, deploy
+immediato su qualsiasi hosting statico. Il JavaScript sta in file `.js` separati
+anziché inline — è la condizione che permette una CSP capace di bloccare davvero
+gli script iniettati (vedi [Sicurezza](#sicurezza)).
 
 ---
 
@@ -130,6 +137,44 @@ Questo significa che i dati sensibili (nomi, email, richieste) **non sono leggib
 - Tabella ordinabile per nome, email, unità richiesta, data
 - Ricerca testuale su nome ed email
 - Refresh manuale dei dati
+
+---
+
+## Sicurezza
+
+Tre misure, oltre alle RLS policy del database.
+
+**Escaping dell'output nella dashboard.** La tabella `acquisitions` ha `INSERT`
+pubblico: chiunque può scriverci, anche senza passare dal form. I record finiscono
+in `innerHTML` nella dashboard, quindi un valore come
+`<img src=x onerror="...">` in un campo nome verrebbe eseguito **nella sessione
+autenticata dell'amministratore** — abbastanza per rubargli il token e leggere
+tutte le richieste. Ogni valore che arriva dal database passa perciò da `esc()`
+(`js/admin.js`) prima di essere inserito nel markup.
+
+**Subresource Integrity sullo script Supabase.** Il tag `<script>` puntava a
+`@supabase/supabase-js@2`, cioè all'ultima 2.x disponibile: codice mai verificato,
+che cambia da solo, eseguito sulla pagina che contiene il form di login. Ora la
+versione è fissata e accompagnata da un hash `integrity`: se i byte non
+corrispondono, il browser rifiuta il file.
+
+Per aggiornare la libreria vanno cambiati **sia la versione sia l'hash**, in
+`index.html` e `admin.html`:
+
+```bash
+curl -s https://cdn.jsdelivr.net/npm/@supabase/supabase-js@<versione>/dist/umd/supabase.js   | openssl dgst -sha384 -binary | openssl base64 -A
+```
+
+**Content Security Policy.** Definita come header HTTP in `vercel.json` e non come
+`<meta>`, perché in un meta tag la direttiva `frame-ancestors` viene ignorata.
+`script-src 'self' https://cdn.jsdelivr.net` blocca qualsiasi script inline
+iniettato; `connect-src` limitato al progetto Supabase impedisce a un eventuale
+script ostile di spedire dati altrove. Insieme alla CSP il file imposta
+`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` e
+`Permissions-Policy`.
+
+> La CSP arriva dagli header di Vercel: aprendo i file in locale con `file://`
+> non è attiva. Per provarla serve un server che invii quegli header.
 
 ---
 
