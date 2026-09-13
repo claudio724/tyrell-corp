@@ -1,5 +1,10 @@
 -- Limiti sulle tabelle a scrittura pubblica.
--- Da eseguire una volta nello SQL Editor di Supabase.
+--
+-- STATO: sezioni 1, 2 e 2b applicate al database il 13/09/2026.
+--        La sezione 3 non e' stata eseguita: al momento non c'era nulla da
+--        cancellare (31 righe in keepalive, nessuna oltre i 30 giorni).
+--        Non rilanciare le sezioni 2 e 2b: darebbero `constraint already
+--        exists`. Restano qui come documentazione dei vincoli attivi.
 --
 -- Contesto: `acquisitions` e `keepalive` hanno INSERT pubblico. Chiunque
 -- conosca la publishable key (che sta nel sorgente della pagina, per
@@ -87,6 +92,15 @@ alter table public.acquisitions
 -- La tabella cresce di due righe al giorno per sempre, e la sua policy
 -- di INSERT e' `with check (true)` per il ruolo anon: chiunque puo'
 -- gonfiarla. Del heartbeat interessa solo che sia recente.
+--
+-- Attenzione a non scambiare questa pulizia per una difesa: contro
+-- un'inondazione non serve, perche' interverrebbe trenta giorni dopo. E'
+-- manutenzione. Il vettore si chiuderebbe solo togliendo l'INSERT
+-- pubblico, cosa che richiede di far autenticare il workflow di
+-- keep-alive con una chiave di servizio invece della publishable key —
+-- valutato il 13/09/2026 e rimandato: mettere una `service_role` key nei
+-- secret del repo e' un rischio maggiore del danno che evita (oggi il
+-- peggio e' una tabella di timestamp riempita da un estraneo).
 
 delete from public.keepalive
 where pinged_at < now() - interval '30 days';
