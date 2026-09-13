@@ -26,7 +26,9 @@ where char_length(first_name) > 80
    or char_length(last_name) > 80
    or char_length(email) > 254
    or char_length(unit_requested) > 120
-   or char_length(deployment_context) > 2000;
+   or char_length(deployment_context) > 2000
+   or email is null
+   or btrim(email) = '';
 
 
 -- ─────────────────────────────────────────────────────────────
@@ -47,6 +49,30 @@ alter table public.acquisitions
     check (char_length(unit_requested) <= 120),
   add constraint acquisitions_context_len
     check (char_length(deployment_context) <= 2000);
+
+
+-- ─────────────────────────────────────────────────────────────
+-- 2b. L'email deve esserci
+-- ─────────────────────────────────────────────────────────────
+-- Una richiesta di acquisto senza email e' inservibile: non c'e' modo di
+-- rispondere. Il `required` aggiunto al form vale solo per chi passa dal
+-- browser; una richiesta costruita a mano contro l'API lo ignora, ed e'
+-- cosi' che erano entrate le righe vuote ripulite a mano il 13/09/2026.
+--
+-- `btrim(...) <> ''` oltre a `is not null` perche' il form manda
+-- `.value.trim()`: un campo mai compilato arriva come stringa vuota, non
+-- come null. Un vincolo sul solo null non fermerebbe nulla.
+--
+-- Il contesto operativo resta facoltativo, per scelta.
+
+alter table public.acquisitions
+  add constraint acquisitions_email_presente
+    check (email is not null and btrim(email) <> '');
+
+-- Volendo si puo' pretendere anche nome e cognome, che il form ora
+-- richiede allo stesso modo:
+--   add constraint acquisitions_nome_presente
+--     check (btrim(first_name) <> '' and btrim(last_name) <> '');
 
 -- Se il passo 1 segnala righe che vuoi conservare cosi' come sono,
 -- aggiungi i vincoli con `not valid`: valgono solo da qui in avanti.
