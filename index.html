@@ -1260,6 +1260,7 @@
                 id="login-email"
                 type="email"
                 placeholder="agent@tyrell.corp"
+                autocomplete="username"
                 required
               />
             </div>
@@ -1270,6 +1271,7 @@
                 id="login-password"
                 type="password"
                 placeholder="••••••••"
+                autocomplete="current-password"
                 required
               />
             </div>
@@ -1734,6 +1736,9 @@
                   id="fname"
                   type="text"
                   placeholder="Roy"
+                  autocomplete="given-name"
+                  maxlength="80"
+                  required
                 />
               </div>
               <div class="form-group">
@@ -1743,6 +1748,9 @@
                   id="lname"
                   type="text"
                   placeholder="Batty"
+                  autocomplete="family-name"
+                  maxlength="80"
+                  required
                 />
               </div>
             </div>
@@ -1753,11 +1761,14 @@
                 id="email"
                 type="email"
                 placeholder="r.batty@offworld.corp"
+                autocomplete="email"
+                maxlength="254"
+                required
               />
             </div>
             <div class="form-group">
               <label class="form-label" for="unit">Unit of Interest</label>
-              <select class="form-select" id="unit">
+              <select class="form-select" id="unit" required>
                 <option value="">Select a model…</option>
                 <option>NX-7 RACHAEL — Administrative</option>
                 <option>NX-8 ROY — Combat / Security</option>
@@ -1775,6 +1786,7 @@
                 class="form-textarea"
                 id="deployment"
                 placeholder="Describe your operational requirements…"
+                maxlength="2000"
               ></textarea>
             </div>
             <button

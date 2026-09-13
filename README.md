@@ -176,6 +176,14 @@ script ostile di spedire dati altrove. Insieme alla CSP il file imposta
 > La CSP arriva dagli header di Vercel: aprendo i file in locale con `file://`
 > non è attiva. Per provarla serve un server che invii quegli header.
 
+**Limiti sulle scritture pubbliche.** `acquisitions` e `keepalive` accettano
+`INSERT` da chiunque: è quello che fa funzionare il form senza backend, ma
+significa anche che una richiesta costruita a mano può ignorare completamente il
+browser. I campi del form hanno `required` e `maxlength`, che però valgono solo
+come guida per chi compila; i limiti veri stanno nel database, in
+`supabase/hardening.sql` (vincoli di lunghezza sulle colonne e retention sulla
+tabella di heartbeat), da eseguire una volta nello SQL Editor.
+
 ---
 
 ## Il Catalogo — Nexus Series
