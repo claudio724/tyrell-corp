@@ -114,7 +114,7 @@ Raccoglie le richieste di acquisto inviate dal form.
 **Permessi:**
 
 - **Scrittura (`INSERT`)**: pubblica — chiunque può inviare il form dal sito
-- **Lettura (`SELECT`)**: riservata agli **utenti autenticati** — solo chi ha effettuato login può consultare le richieste
+- **Lettura (`SELECT`)**: riservata a **un singolo account amministrativo**, identificato per UID nella policy RLS
 
 ---
 
@@ -126,10 +126,19 @@ Il pulsante **"Admin"** nel menu di navigazione apre un modale di login. Il flus
 2. Supabase verifica le credenziali e, se corrette, restituisce un token di sessione (JWT)
 3. L'utente viene reindirizzato a `admin.html`
 4. `admin.html` controlla la presenza di una sessione valida (`auth guard`) — in assenza di login, reindirizza automaticamente a `index.html`
-5. Tutte le richieste alla tabella `acquisitions` vengono effettuate includendo il token di sessione, che il database verifica tramite la policy RLS `auth.role() = 'authenticated'`
+5. Tutte le richieste alla tabella `acquisitions` vengono effettuate includendo il token di sessione, che il database verifica tramite la policy RLS `auth.uid()::text = '<uid dell'admin>'` (vedi `supabase/admin-policy.sql`)
 6. Un bottone **Logout** in `admin.html` chiude la sessione
 
 Questo significa che i dati sensibili (nomi, email, richieste) **non sono leggibili** da chi non possiede credenziali valide, anche conoscendo l'URL diretto della dashboard o leggendo il codice sorgente della pagina.
+
+> La policy era inizialmente scritta come `auth.role() = 'authenticated'`. Sembra
+> equivalente, ma non lo è: in Supabase `authenticated` vale per **qualunque**
+> utente registrato, non per l'amministratore. Con la registrazione pubblica
+> aperta — l'impostazione predefinita — bastava che un estraneo creasse un
+> account e confermasse la propria email per leggere l'intera tabella. La
+> registrazione pubblica ora è disattivata, e la policy guarda l'identita
+> dell'utente invece del suo ruolo: due difese indipendenti, così che
+> riattivare la prima per sbaglio non riapra da sola la falla.
 
 ### Dashboard — funzionalità
 
